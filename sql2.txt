@@ -1,0 +1,202 @@
+--create tables
+
+create table platform( platformID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+ platform varchar(50) )
+
+create table product ( productID INT IDENTITY(1,1) NOT NULL PRIMARY KEY ,
+ productName varchar(50),
+ platformID int foreign key references platform(platformID),
+ productDescription varchar(50),
+ )
+
+create table version ( versionID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+ versionName DECIMAL(2,1),
+ versionDescription varchar(50) )
+
+create table features ( featuresID INT IDENTITY(1,1) NOT NULL PRIMARY KEY ,
+ featuresDescription varchar(50) )
+
+create table type_of_release ( typeOfReleaseID INT IDENTITY(1,1) NOT NULL PRIMARY KEY ,
+ releaseName varchar(50) )
+
+create table release (releaseID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+release DECIMAL(2,1),
+typeOfReleaseID INT FOREIGN KEY references type_of_release(typeOfReleaseID),
+releaseDate DATE)
+
+CREATE TABLE version_feature ( versionFeatureID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+versionID INT foreign key references version(versionID),
+featuresID INT foreign key references features(featuresID) )
+
+CREATE TABLE iteration(iterationID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+iteration INT,
+versionFeatureID INT foreign key references version_feature(versionFeatureID),
+releaseID INT foreign key references release(releaseID) )
+
+CREATE TABLE product_version(
+productVersionID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+productID INT foreign key references product(productID),
+versionID INT foreign key references version(versionID)
+)
+
+CREATE TABLE request (requestID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+productVersionID INT foreign key references product_version(productVersionID),
+numberOfRequest INT,
+month DATE)
+
+CREATE TABLE us_state(stateID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+stateCode char(2)
+)
+
+CREATE TABLE zipcode(zipcodeID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+zipcode varchar(9) )
+
+CREATE TABLE city(cityID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+city varchar(50))
+
+CREATE TABLE cityState(cityStateID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+cityID INT foreign key references city(cityID),
+stateID INT foreign key references us_state(stateID)
+)
+
+CREATE TABLE address(addressID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+patientAdress varchar(50),
+cityStateID INT foreign key references cityState(cityStateID),
+zipcodeID INT foreign key references zipcode(zipcodeID))
+
+CREATE TABLE phone_number(phoneNumberID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+areaCode varchar(3),
+phoneNumber varchar(7))
+
+CREATE TABLE company(companyID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+companyName varchar(50) )
+
+CREATE TABLE customer(customerID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+firstName varchar(50),
+lastName varchar(50),
+email varchar(50),
+companyID INT foreign key references company(companyID))
+
+CREATE TABLE customer_phone(
+phoneNumberID INT foreign key references phone_number(phoneNumberID),
+customerID INT foreign key references customer(customerID)
+)
+
+CREATE TABLE company_phone(
+phoneNumberID INT foreign key references phone_number(phoneNumberID),
+companyID INT foreign key references company(companyID) )
+
+CREATE TABLE company_address(
+addressID INT foreign key references address(addressID),
+companyID INT foreign key references company(companyID)
+)
+
+CREATE TABLE customer_address(
+addressID INT foreign key references address(addressID),
+customerID INT foreign key references customer(customerID)
+)
+
+CREATE TABLE branch(
+branchID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+productVersionID INT foreign key references product_version(productVersionID),
+)
+
+CREATE TABLE iteration(
+iterationID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+iteration INT,
+versionFeatureID INT foreign key references version_feature(versionFeatureID),
+releaseID INT foreign key references release(releaseID)
+)
+
+CREATE TABLE download(
+downloadID INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+downloadLink varchar(50),
+productID INT foreign key references product(productID),
+iterationID INT foreign key references iteration(iterationID),
+customerID INT foreign key references customer(customerID)
+)
+
+--insert into tables
+
+INSERT INTO dbo.platform Values('Windows');
+INSERT INTO dbo.platform Values('Linux');
+
+INSERT INTO dbo.product (productName, platformID, productDescription) VALUES ('EHR System', 1, 'health records system for the patients')
+INSERT INTO dbo.product (productName, platformID, productDescription) VALUES ('EHR System', 2, 'health records system for the patients')
+
+INSERT INTO dbo.version (versionName) VALUES (1.1);
+INSERT INTO dbo.version (versionName) VALUES (1.2);
+INSERT INTO dbo.version (versionName) VALUES (2.1);
+INSERT INTO dbo.version (versionName) VALUES (2.2);
+
+INSERT INTO dbo.features (featuresDescription) VALUES('login module')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient registration')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient profile')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient release form')
+INSERT INTO dbo.features (featuresDescription) VALUES('physician profile')
+INSERT INTO dbo.features (featuresDescription) VALUES('address verification')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient authentication')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient medication form')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient e-bill')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient reporting')
+INSERT INTO dbo.features (featuresDescription) VALUES('patient reporting bug fix')
+
+INSERT INTO type_of_release (releaseName) VALUES('new product release');
+INSERT INTO type_of_release (releaseName) VALUES('new features release');
+INSERT INTO type_of_release (releaseName) VALUES('bug-fix release');
+
+INSERT INTO dbo.release (release, typeOfReleaseID, releaseDate) VALUES(1.1, 1, '20000101')
+INSERT INTO dbo.release (release, typeOfReleaseID, releaseDate) VALUES(2.1, 2, '20000501')
+INSERT INTO dbo.release (release, typeOfReleaseID, releaseDate) VALUES(2.2, 3, '20000613')
+
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 1)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 2)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 3)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 4)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 5)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 6)
+INSERT INTO version_feature (versionID, featuresID) VALUES(2, 1)
+INSERT INTO version_feature (versionID, featuresID) VALUES(2, 2)
+INSERT INTO version_feature (versionID, featuresID) VALUES(2, 3)
+INSERT INTO version_feature (versionID, featuresID) VALUES(2, 4)
+INSERT INTO version_feature (versionID, featuresID) VALUES(2, 5)
+INSERT INTO version_feature (versionID, featuresID) VALUES(1, 6)
+INSERT INTO version_feature (versionID, featuresID) VALUES(3, 7)
+INSERT INTO version_feature (versionID, featuresID) VALUES(3, 8)
+INSERT INTO version_feature (versionID, featuresID) VALUES(3, 9)
+INSERT INTO version_feature (versionID, featuresID) VALUES(3, 10)
+INSERT INTO version_feature (versionID, featuresID) VALUES(4, 7)
+INSERT INTO version_feature (versionID, featuresID) VALUES(4, 8)
+INSERT INTO version_feature (versionID, featuresID) VALUES(4, 9)
+INSERT INTO version_feature (versionID, featuresID) VALUES(4, 10)
+INSERT INTO version_feature (versionID, featuresID) VALUES(4, 11)
+
+INSERT INTO dbo.product_version (productID, versionID) VALUES(1, 1)
+INSERT INTO dbo.product_version (productID, versionID) VALUES(1, 3)
+INSERT INTO dbo.product_version (productID, versionID) VALUES(2, 1)
+INSERT INTO dbo.product_version (productID, versionID) VALUES(2, 2)
+INSERT INTO dbo.product_version (productID, versionID) VALUES(2, 4)
+
+INSERT INTO dbo.request (productVersionID, numberOfRequest, month) VALUES (1, 34, '20010920')
+INSERT INTO dbo.request (productVersionID, numberOfRequest, month) VALUES (2, 99, '20010920')
+
+INSERT INTO us_state (stateCode) VALUES('CA')
+
+INSERT INTO zipcode (zipcode) VALUES (91303)
+
+INSERT INTO city (city) VALUES ('canoga park')
+
+INSERT INTO cityState (cityID,stateID) VALUES(1,1)
+
+INSERT INTO address (patientAdress, cityStateID, zipcodeID) VALUES('7000 vassar st #4', 1, 1)
+
+INSERT INTO phone_number (areaCode, phoneNumber) VALUES('888', '1114444')
+
+INSERT INTO company VALUES('Wal-Mart')
+
+INSERT INTO customer (firstName, lastName, email, companyID) VALUES('chris', 'silva', 'christom525@yahoo.com', 1)
+--update
+
+UPDATE dbo.version
+SET versionName='2.1'
+WHERE versionID = 3
