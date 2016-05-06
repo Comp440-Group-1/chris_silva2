@@ -1,0 +1,55 @@
+CREATE PROC updateVersion
+@v DECIMAL(2,1),
+@d varchar(50)
+AS
+BEGIN
+UPDATE dbo.version 
+SET 
+versionDescription=@d
+WHERE
+versionName=@v
+END
+---------------------------------------------
+CREATE PROC insertPlatform
+@p varchar(50)
+AS
+BEGIN
+INSERT INTO dbo.platform VALUES(@p)
+END
+---------------------------------------------
+CREATE PROC generateReport
+AS
+BEGIN
+select 
+p.productName,
+v.versionName,
+r.numberOfRequest,
+r.month
+from product_version as pv
+join product as p
+on pv.productID=p.productID
+join version as v
+on pv.versionID=v.versionID
+join request as r
+on pv.productVersionID=r.productVersionID
+END
+---------------------------------------------
+
+CREATE PROC numberOfFeaturesPerVersion
+@v decimal(2,1)
+
+as
+declare @afuera1 int
+declare @versionID int
+ 
+begin
+select  @versionID=versionID from version where versionName = @v;
+select @afuera1 = count(*) from version_feature where versionID=@versionID;
+
+if @afuera1 = 0
+print 'It is a bug –fix release. There are no new features (or that release does not extist)'
+else
+print cast(@afuera1 as varchar) + ' features are in the ' + cast(@v as varchar) + ' release '
+
+
+end
